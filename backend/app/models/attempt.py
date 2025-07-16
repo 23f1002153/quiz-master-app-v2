@@ -5,15 +5,15 @@ class Attempt(db.Model):
     __tablename__ = 'attempts'
 
     id = db.Column(db.Integer, primary_key = True)
-    attempted_at = db.Column(db.DateTime, nullable = False, default = datetime.now)
+    attempted_at = db.Column(db.DateTime, nullable = False, default = datetime.now, index = True)
     score = db.Column(db.Integer, nullable = False)
     total_ques = db.Column(db.Integer, nullable = False)
     correct_ans = db.Column(db.Integer, nullable = False)
     completed = db.Column(db.Boolean, nullable = False, default = True)
 
     ## Foreign Key
-    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id', ondelete='CASCADE'), nullable = False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable = False)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id', ondelete='CASCADE'), nullable = False, index = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable = False, index = True)
 
     ## Relationships
     attempt_responses = db.relationship('AttemptResponse', backref='attempt', lazy=True, cascade="all, delete")
