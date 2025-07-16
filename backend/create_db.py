@@ -8,14 +8,16 @@ def create_default_admin():
         admin = User(
             username='admin',
             email='admin@example.com',
-            gender='Male',
+            gender='male',
             dob=date(2003, 11, 20),
             joiningDate=date.today(),
             qualification='Admin',
             college='System',
             last_login=datetime.now(),
+            phone=1234567890,
             role='admin'
         )
+        
         admin.set_password('admin123')
         db.session.add(admin)
         db.session.commit()

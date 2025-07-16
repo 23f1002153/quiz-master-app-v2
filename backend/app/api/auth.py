@@ -4,6 +4,8 @@ from app.models import User
 from app import db
 from flask_jwt_extended import create_access_token
 from datetime import timedelta
+from app.utils.validators import *
+from app.utils.formatters import format_date
 
 class RegisterResource(Resource):
     def post(self):
@@ -12,15 +14,45 @@ class RegisterResource(Resource):
         username = data.get("username")
         email = data.get("email")
         password = data.get("password")
+        gender = data.get("gender")
+        dob = data.get("dob")
+        qualification = data.get("qualification")
+        college = data.get("college")
+        phone = data.get("phone")
 
-        if not username or not email or not password:
-            return {"message": "Username, email, and password are required."}, 400
-
+        error  = (validate_string(username, 'username') or
+                  validate_email(email) or 
+                  validate_date(dob, before_today=True) or 
+                  validate_gender(gender) or
+                  validate_phone(phone) or
+                  validate_string(college, 'college') or
+                  validate_string(qualification, 'qualification') or
+                  validate_password(password)
+                )
+        if error:
+            return {"message": error}, 422
+                
         # Check if user already exists
-        if User.query.filter((User.username == username) | (User.email == email)).first():
-            return {"message": "Username or email already exists."}, 409
-
-        user = User(username=username, email=email, role='user')
+        if User.query.filter((User.username == username)).first():
+            return {"message": "Username already exists."}, 409
+        
+        # Check if email already exists
+        if User.query.filter((User.email == email)).first():
+            return {"message": "Email already exists."}, 409
+        
+        # Check if phone already exists
+        if User.query.filter((User.phone == phone)).first():
+            return {"message": "Phone number already exists."}, 409
+        
+        user = User(username=username.strip(), 
+                    email=email.strip(),
+                    gender = gender.strip(),
+                    dob = format_date(dob),
+                    qualification = qualification.strip(),
+                    college = college.strip(),
+                    phone = int(phone),
+                    role='user')
+        
         user.set_password(password)
 
         db.session.add(user)
@@ -41,9 +73,6 @@ class LoginResource(Resource):
 
         user = User.query.filter_by(username=username).first()
 
-        if user:
-            print("User ID:", user.id, type(user.id))
-
         if not user or not user.check_password(password):
             return {"message": "Invalid credentials."}, 401
 
@@ -51,7 +80,7 @@ class LoginResource(Resource):
         access_token = create_access_token(
             identity=str(user.id),  
             additional_claims={"role": user.role},  # extra info
-            expires_delta=timedelta(hours=1)
+            expires_delta=timedelta(hours=10)
         )
 
         return {

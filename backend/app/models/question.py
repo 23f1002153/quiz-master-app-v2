@@ -20,6 +20,5 @@ class Question(db.Model):
             "statement": self.statement,
             "marks": self.marks,
             "quiz_id": self.quiz_id,
-            "quiz_name": self.quiz.name, ## get quiz name also
-            "options": [option.to_dict() for option in self.options] 
+            "quiz_name": self.quiz.name, ## get quiz name also 
         }
