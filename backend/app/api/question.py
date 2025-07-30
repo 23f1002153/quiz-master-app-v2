@@ -59,7 +59,7 @@ class QuestionResource(Resource):
         db.session.delete(question)
         db.session.commit()
 
-        return {"Question deleted successfully"}, 200        
+        return {"message": "Question deleted successfully"}, 200        
 
 class QuestionListResource(Resource):
     @jwt_required()
@@ -99,7 +99,7 @@ class QuestionListResource(Resource):
         db.session.add(question)
         db.session.commit()
 
-        return {"message": "Question created successfully"}, 201
+        return {"message": "Question created successfully", "id": question.id}, 201
     
 def register_question_routes(api):
     api.add_resource(QuestionResource, '/api/question/<int:question_id>')

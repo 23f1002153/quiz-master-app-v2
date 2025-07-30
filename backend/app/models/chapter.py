@@ -28,5 +28,6 @@ class Chapter(db.Model):
         if include_internal:
             data.update({
                 "created_at": self.created_at.isoformat(),
+                "quizzes": [quiz.to_dict(include_internal = True) for quiz in self.quizzes]
             })
         return data

@@ -1,7 +1,7 @@
 from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from app.models import Chapter, Subject, Quiz
+from app.models import Chapter, Subject, Quiz, User, Attempt
 from app import db
 from datetime import datetime, date
 from app.utils.auth import role_required
@@ -202,8 +202,31 @@ class QuizListResource(Resource):
         db.session.add(quiz)
         db.session.commit()
 
-        return {"message": "Quiz created successfully"}, 201
+        return {"message": "Quiz created successfully", "id": quiz.id}, 201
+
+class UserQuizzesResource(Resource):
+    @jwt_required()
+    def get(self):
+        user_id = get_jwt_identity()
+
+        user = User.query.filter_by(id = user_id).first()
+
+        attempts = Attempt.query.filter_by(user_id = user_id).all()
+        # results = [ for attempt in attempts]
+
+        # quizzes = Quiz.query.filter(Quiz.id.in_(quiz_ids)).all()
+
+        return [attempt.to_dict() for attempt in attempts], 200
+    
+class AllQuizzesResource(Resource):
+    @role_required('admin')
+    def get(self):
+        quizzes = Quiz.query.all()
+        return [quiz.to_dict(include_internal = True) for quiz in quizzes], 200 
+
 
 def register_quiz_routes(api):
     api.add_resource(QuizResource, '/api/quiz/<int:quiz_id>')
     api.add_resource(QuizListResource, '/api/quizzes/<int:chapter_id>')
+    api.add_resource(UserQuizzesResource, '/api/user/quizzes')
+    api.add_resource(AllQuizzesResource, '/api/quizzes/all')

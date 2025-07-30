@@ -10,7 +10,7 @@ class Quiz(db.Model):
     is_active = db.Column(db.Boolean, nullable = False, default = True)
     created_at = db.Column(db.DateTime, default = datetime.now)
     updated_at = db.Column(db.DateTime, onupdate = datetime.now)
-    date = db.Column(db.DateTime, nullable = False)
+    date = db.Column(db.Date, nullable = False)
     time = db.Column(db.String, nullable = False)
     duration = db.Column(db.Integer,nullable = False) # in minutes
     remarks = db.Column(db.String(500))
@@ -29,13 +29,16 @@ class Quiz(db.Model):
         data = {
             "id": self.id,
             "name": self.name,
-            "description": self.description,"date": self.date.isoformat() if self.date else None,
+            "description": self.description,
+            "date": self.date.isoformat() if self.date else None,
             "time":(self.time) if self.time else None,
             "duration": self.duration,"chapter_id": self.chapter_id,
-            "chapter_name": self.chapter.name,  ## get chapter also
+            "chapter_name": self.chapter.name,  ## get chapter also,
+            "subject_name": self.chapter.subject.name,  ## get subject also
             "is_started": self.is_started,
             "is_ongoing": self.is_ongoing,
-            "is_ended": self.is_ended
+            "is_ended": self.is_ended,
+            "attempts": [attempt.to_dict() for attempt in self.attempts],
         }
         if include_internal: # admin 
             data.update({

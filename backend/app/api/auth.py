@@ -6,6 +6,7 @@ from flask_jwt_extended import create_access_token
 from datetime import timedelta
 from app.utils.validators import *
 from app.utils.formatters import format_date
+from datetime import datetime
 
 class RegisterResource(Resource):
     def post(self):
@@ -74,7 +75,10 @@ class LoginResource(Resource):
         user = User.query.filter_by(username=username).first()
 
         if not user or not user.check_password(password):
-            return {"message": "Invalid credentials."}, 401
+            return {"message": "Invalid username or password"}, 401
+
+        user.last_login = datetime.now()
+        db.session.commit()
 
         # Create access token (valid for 1 hour)
         access_token = create_access_token(

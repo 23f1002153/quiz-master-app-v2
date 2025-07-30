@@ -26,9 +26,14 @@ class Attempt(db.Model):
             "total_score": self.total_score,
             "total_questions": self.total_questions,
             "total_correct": self.total_correct,
+            "percentage": round(self.total_score / self.total_marks * 100),
             "completed": self.completed,
+            "duration": self.quiz.duration,
             "quiz_id": self.quiz_id,
             "quiz_name": self.quiz.name,
             "user_id": self.user_id,
             "user_name": self.user.username,
+            "chapter_name": self.quiz.chapter.name,
+            "subject_name": self.quiz.chapter.subject.name,
+            "is_ended": self.quiz.is_ended
         }

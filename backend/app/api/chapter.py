@@ -101,8 +101,18 @@ class ChapterListResource(Resource):
         db.session.add(chapter)
         db.session.commit()
 
-        return {"message": "Chapter created successfully"}, 201
+        return {"message": "Chapter created successfully", "id": chapter.id}, 201
 
+# class ChapterQuizResource(Resource):
+#     @jwt_required()
+#     def get(self, chapter_id):
+#         chapter = Chapter.query.filter_by(id = chapter_id).first()
+#         if not(chapter):
+#             return {"message": f"Chapter with id {chapter_id} not found"}, 404
+        
+#         return [quiz.to_dict() for quiz in chapter.quizzes], 200
+  
 def register_chapter_routes(api):
     api.add_resource(ChapterResource, '/api/chapter/<int:chapter_id>')
     api.add_resource(ChapterListResource, '/api/chapters/<int:subject_id>')
+    # api.add_resource(ChapterQuizResource, '/api/chapter/<int:chapter_id>/quizzes')

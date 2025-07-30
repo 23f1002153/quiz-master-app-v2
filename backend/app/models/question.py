@@ -14,11 +14,12 @@ class Question(db.Model):
     options = db.relationship('Option', backref='question', lazy=True, cascade="all, delete")
     attempt_responses = db.relationship('AttemptResponse', backref='question', lazy=True, cascade="all, delete")
 
-    def to_dict(self):
+    def to_dict(self, include_internal = False):
         return {
             "id": self.id,
             "statement": self.statement,
             "marks": self.marks,
             "quiz_id": self.quiz_id,
-            "quiz_name": self.quiz.name, ## get quiz name also 
+            "quiz_name": self.quiz.name, ## get quiz name also
+            "options": [option.to_dict(include_internal = include_internal) for option in self.options]
         }

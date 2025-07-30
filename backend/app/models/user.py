@@ -41,6 +41,7 @@ class User(db.Model):
             "username": self.username,
             "email": self.email,
             "gender": self.gender,
+            "phone": self.phone,
             "dob": self.dob.isoformat(),
             "joiningDate": self.joiningDate.isoformat(),
             "qualification": self.qualification,

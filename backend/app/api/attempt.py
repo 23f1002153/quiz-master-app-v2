@@ -1,7 +1,7 @@
 from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from app.models import Chapter, Subject, Quiz, Question, Option, Attempt, QuizSession, AttemptResponse
+from app.models import Chapter, Subject, Quiz, Question, Option, Attempt, QuizSession, AttemptResponse, User
 from app import db
 from datetime import datetime, date, timedelta
 from app.utils.auth import role_required
@@ -47,12 +47,15 @@ class QuizSessionResource(Resource):
         if not quiz.is_started:
             return {"message": "Quiz time hasn't started yet"}, 400
         
+        attempt = Attempt.query.filter_by(quiz_id = quiz_id, user_id = user_id).first()
+        if attempt:
+            return {"message": f"Quiz with id {quiz_id} already submitted"}, 400        
+
         quiz_session = QuizSession.query.filter_by(quiz_id = quiz_id, user_id = user_id).first()
         if quiz_session:
             return {"message": f"Quiz with id {quiz_id} has already been started"}, 400
         
 
-        
         quiz_session = QuizSession(
             user_id = user_id,
             quiz_id = quiz_id
@@ -63,6 +66,13 @@ class QuizSessionResource(Resource):
 
         return {"message": "Quiz started successfully"}, 201
 
+class UserAttemptsResources(Resource):
+    @jwt_required()
+    def get(self):
+        user_id = get_jwt_identity()
+
+        user = User.query.filter_by(id = user_id).first()
+        return user.to_dict()['attempts'];
         
 class AttemptResource(Resource):
     # submit a quiz or retrieve submitted answers
@@ -113,7 +123,7 @@ class AttemptResource(Resource):
                 else:
                     selected_option_data = None
 
-                question_data = question.to_dict()
+                question_data = question.to_dict(include_internal = True)
                 entry = {
                     "question": question_data,
                     "selected_option": selected_option_data
@@ -156,7 +166,7 @@ class AttemptResource(Resource):
             option = Option.query.filter_by(id = option_id).first()
 
             if not question or not option or option.question_id != question_id:
-                continue
+                return {"message": "Invalid Responses"}, 422
 
             total_marks += question.marks
             if option.is_correct:
@@ -194,7 +204,7 @@ class AttemptResource(Resource):
 class AllQuestionsResource(Resource):
     # fetch all questions
     @jwt_required()
-    def get(self, quiz_id):
+    def get(self, quiz_id, include_internal = False):
         user = get_jwt()
         quiz = Quiz.query.filter_by(id = quiz_id).first()
         if not(quiz):
@@ -206,7 +216,7 @@ class AllQuestionsResource(Resource):
             if user.get("role") == 'admin':
                 q_dict["options"] = [o.to_dict(include_internal = True) for o in q.options]
             else:
-                q_dict["options"] = [o.to_dict() for o in q.options]
+                q_dict["options"] = [o.to_dict(include_internal = include_internal) for o in q.options]
             questions.append(q_dict)
         return questions, 200
 
@@ -225,9 +235,18 @@ class ResultResource(Resource):
             return {"message": f"Quiz not attempted"}, 400
 
         return attempt.to_dict(), 200        
+    
+class AllAttemptsResource(Resource):
+    @role_required('admin')
+    def get(self):
+        attempts = Attempt.query.all()
+        return [attempt.to_dict() for attempt in attempts], 200
 
 def register_attempt_routes(api):
     api.add_resource(QuizSessionResource, '/api/quiz/<int:quiz_id>/start')
+    api.add_resource(UserAttemptsResources, '/api/user/attempts')
     api.add_resource(AttemptResource, '/api/quiz/<int:quiz_id>/submit')
     api.add_resource(AllQuestionsResource, '/api/quiz/<int:quiz_id>/questions')
     api.add_resource(ResultResource, '/api/quiz/<int:quiz_id>/result')
+    api.add_resource(AllAttemptsResource, '/api/attempts/all')
+

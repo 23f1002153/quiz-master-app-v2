@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import User
 from app import db
 from app.utils.validators import*
+from app.utils.auth import role_required
 from app.utils.formatters import format_date
 class MeResource(Resource):
     @jwt_required()
@@ -34,7 +35,7 @@ class UpdateProfileResource(Resource):
         college = data.get("college")
         phone = data.get("phone")
 
-        if not(email) and not(gender) and not(dob) and not(qualification) and not(college):
+        if not(email) and not(gender) and not(dob) and not(qualification) and not(college) and not(phone):
             return {"message": "Invalid request. Nothing to update"}, 422            
 
         # Check if email is being changed and is already taken
@@ -114,9 +115,15 @@ class UpdatePasswordResource(Resource):
         else:
             return {"message": "Old Password does not match"}, 401 # Unauthorized
 
+class AllUsersResource(Resource):
+    @role_required('admin')
+    def get(self):
+        users = User.query.filter_by(role = 'user').all()
+        return {"users": [user.to_dict() for user in users]}, 200
 
 def register_user_routes(api):
     api.add_resource(MeResource, '/api/users/me')
     api.add_resource(UpdateProfileResource, '/api/users/update-profile')
     api.add_resource(UpdatePasswordResource, '/api/users/update-password')
+    api.add_resource(AllUsersResource, '/api/users/all')
     

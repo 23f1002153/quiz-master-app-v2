@@ -4,7 +4,7 @@ from flask_restful import Api
 from app.config import Config
 from app.extensions import db, jwt
 from app.api import *
-
+from celery_app import make_celery
 
 from flask import jsonify
 from werkzeug.exceptions import HTTPException
@@ -37,4 +37,7 @@ def create_app():
     #     app.logger.error(f"Unhandled Exception: {e}", exc_info=True)
     #     return jsonify(message="Internal Server Error"), 500
 
+    celery = make_celery(app)
+    app.celery = celery
+    
     return app

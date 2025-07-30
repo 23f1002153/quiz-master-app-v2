@@ -96,8 +96,19 @@ class SubjectListResource(Resource):
         db.session.add(subject)
         db.session.commit()
 
-        return {"message": "Subject created successfully"}, 201
+        return {"message": "Subject created successfully", "id": subject.id}, 201
+
+# class SubjectChapterResource(Resource):
+#     @jwt_required()
+#     def get(self, subject_id):
+#         subject = Subject.query.filter_by(id = subject_id).first()
+#         if not(subject):
+#             return {"message": f"Subject with id {subject_id} not found"}, 404
         
+#         return [chapter.to_dict() for chapter in subject.chapters], 200
+    
+
 def register_subject_routes(api):
     api.add_resource(SubjectResource, '/api/subject/<int:subject_id>')
     api.add_resource(SubjectListResource, '/api/subjects')
+    # api.add_resource(SubjectChapterResource, '/api/subject/<int:subject_id>/chapters')

@@ -8,7 +8,7 @@ class Subject(db.Model):
     name = db.Column(db.String(120), nullable = False)
     description = db.Column(db.String(500), nullable = False)
     created_at = db.Column(db.DateTime, default = datetime.now)
-    updated_at = db.Column(db.DateTime, onupdate = datetime.now)
+    updated_at = db.Column(db.DateTime, onupdate = datetime.now, default = datetime.now)
 
     ## Relationship
     chapters = db.relationship('Chapter', backref='subject', lazy=True, cascade="all, delete")
@@ -22,6 +22,7 @@ class Subject(db.Model):
         if include_internal:
             data.update({
                 "created_at": self.created_at.isoformat(),
-                "updated_at": self.updated_at.isoformat()
+                "updated_at": self.updated_at.isoformat(),
+                "chapters": [chapter.to_dict(include_internal = True) for chapter in self.chapters],
             })
         return data
