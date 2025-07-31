@@ -6,3 +6,4 @@ from app.api.quiz import register_quiz_routes
 from app.api.question import register_question_routes
 from app.api.option import register_option_routes
 from app.api.attempt import register_attempt_routes
+from app.api.jobs import register_job_routes

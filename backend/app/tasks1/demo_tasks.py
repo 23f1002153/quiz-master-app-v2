@@ -4,5 +4,5 @@ import time
 @celery.task
 def addition(x, y):
     print("RUNNING. The output is ", x + y)
-    time.sleep(15)
-    return "DONE"
+    time.sleep(5)
+    return x + y

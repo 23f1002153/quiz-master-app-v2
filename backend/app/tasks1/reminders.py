@@ -11,8 +11,8 @@ def send_daily_reminders():
 
         print("REMINDER SENT")
 
-        now = datetime.utcnow()
-        yesterday = now - timedelta(days=1)
+        now = datetime.now()
+        yesterday = now - timedelta(minutes=10)
 
         # Find users who didn't log in yesterday (mock logic)
         inactive_users = User.query.filter(User.last_login < yesterday).all()
@@ -25,4 +25,4 @@ def send_daily_reminders():
             print(f"[Reminder] {user.email} - You haven't visited the site recently!")
 
         for quiz in new_quizzes:
-            print(f"[New Quiz Alert] Quiz '{quiz.title}' was added recently!")
+            print(f"[New Quiz Alert] Quiz '{quiz.name}' was added recently!")
