@@ -9,17 +9,16 @@
       <!-- Center: Nav Items -->
       <div class="d-none d-lg-flex mx-auto" id="navbarNav">
         <ul class="navbar-nav">
-          <NavItem :to="{ name: 'home' }">Home</NavItem>
-          <NavItem :to="{ name: 'about' }">About</NavItem>
-          <NavItem :to="{ name: 'subject' }">Classroom</NavItem>
-          <NavItem :to="{ name: 'quizzeria' }">Quizzeria</NavItem>
-          <NavItem :to="{ name: 'result' }">Results</NavItem>
+          <NavItem :to="{ name: 'admin_dashboard' }">Dashboard</NavItem>
+          <NavItem :to="{ name: 'admin_subjects' }">Classroom</NavItem>
+          <NavItem :to="{ name: 'admin_users' }">Users</NavItem>
+          <NavItem :to="{ name: 'admin_stats' }">Results</NavItem>
         </ul>
       </div>
 
       <!-- Right: Profile -->
       <div class="ms-auto">
-        <NavItem :to="{ name: 'profile' }">Profile</NavItem>
+        <button class="btn btn-dark" @click="logout">Logout</button>
       </div>
 
     </div>
@@ -28,5 +27,17 @@
 
 <script setup>
 import NavItem from '@/components/nav/NavItem.vue';
-import { RouterLink } from 'vue-router';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const logout = () => {
+  if (window.confirm("Are you sure you want to logout?")) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    router.push('/login');
+  }
+};
+
+
 </script>

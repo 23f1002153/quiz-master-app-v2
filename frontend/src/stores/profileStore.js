@@ -57,7 +57,6 @@ export const useProfileStore = defineStore('profileStore', {
         }
         else{
           this.errorType = "Something went wrong";
-          console.log("Something went wrong");
         }
         throw error
       }

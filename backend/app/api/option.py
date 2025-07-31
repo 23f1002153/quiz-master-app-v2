@@ -7,9 +7,10 @@ from datetime import datetime, date
 from app.utils.auth import role_required
 from app.utils.validators import validate_string, validate_int, validate_date, validate_time, validate_bool
 from app.utils.formatters import format_date, format_time
+from app.utils.cache_key import role_based_cache_key
 
 class OptionResource(Resource):
-    @cache.cached(timeout=3600)
+    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
     @jwt_required()
     def get(self, option_id):
         option = Option.query.filter_by(id = option_id).first()
@@ -64,7 +65,7 @@ class OptionResource(Resource):
         return {"message": "Option deleted successfully"}, 200
 
 class OptionListResource(Resource):
-    @cache.cached(timeout=3600)
+    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
     @jwt_required()
     def get(self, question_id):
         question = db.session.query(Question).filter_by(id = question_id).first()

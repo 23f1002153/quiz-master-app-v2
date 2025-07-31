@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia';
 import apiClient from '@/components/api/axios';
 
-export const useChapterStore = defineStore('chapterStore', {
+export const useAdminChapterStore = defineStore('adminChapterStore', {
   state: () => ({
     chaptersBySubject: {},        // subject_id -> [chapters]
     selectedChapter: null,
@@ -26,27 +26,31 @@ export const useChapterStore = defineStore('chapterStore', {
       }
     },
 
-    selectChapter(subjectId, chapterId){
-      this.quizzes = []
-      this.selectedChapter = this.chaptersBySubject[subjectId].find(chapter => chapter.id === chapterId);
-      this.fetchQuizzes();
-      return;
-    },
-
-    async fetchQuizzes(){
-      if(this.quizzes.length > 0 || this.loadingQuizzes) return;
-
-      this.loadingQuizzes = true;
+    async createChapter(data){
       try{
-        const response = await apiClient.get(`quizzes/${this.selectedChapter.id}`);
-        this.quizzes = response.data;
+        await apiClient.post(`/chapters/${data.subject_id}`, data)
       }
       catch(error){
         console.log(error);
       }
-      finally{
-        this.loadingQuizzes = false;
+    },
+
+    async updateChapter(data){
+      try{
+        await apiClient.patch(`/chapter/${data.id}`, data);
+      }
+      catch(error){
+        console.log(error);
       }
     },
+
+    async deleteChapter(data){
+      try{
+        await apiClient.delete(`/chapter/${data.id}`);
+      }
+      catch(error){
+        console.log(error);
+      }
+    }
   }
-});
+})

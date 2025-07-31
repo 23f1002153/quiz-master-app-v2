@@ -17,7 +17,10 @@
         <div class="col-lg-4 h-50">
           <SettingsCard @switch="editingProfile = !editingProfile" :editingProfile="editingProfile" />
         </div>
+        <button class="btn btn-dark fs-4 w-25 mx-auto" @click="logout">Logout</button>
       </div>
+
+
 
     </div>
   </div>
@@ -25,13 +28,16 @@
 
 <script setup>
 
-import { onMounted, ref } from 'vue';
+import { onMounted, ref} from 'vue';
 import { useProfileStore } from '@/stores/profileStore';
 import { storeToRefs } from 'pinia';
 import AboutMe from '@/components/profile/AboutMe.vue';
 import TopSection from '@/components/profile/TopSection.vue';
 import ProfileStatCards from '@/components/profile/ProfileStatCards.vue';
 import SettingsCard from '@/components/profile/SettingsCard.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const profileStore = useProfileStore();
 const { profile, quizzesCompleted,  daysSince, totalXP, level, levelXP } = storeToRefs(profileStore);
@@ -45,6 +51,14 @@ const toggleEdit = () => {
 onMounted(() => {
   profileStore.fetchProfile();
 });
+
+const logout = () => {
+  if (window.confirm("Are you sure you want to logout?")) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    router.push('/login');
+  }
+};
 
 </script>
 

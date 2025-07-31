@@ -53,7 +53,6 @@
           <div class="dashboard-card">
             <div class="card-header">
               <h3>Performance by Subject</h3>
-              <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-download me-2"></i>Download</button>
             </div>
             <div class="card-body">
               <div class="row">
@@ -93,7 +92,6 @@
           <div class="dashboard-card">
             <div class="card-header">
               <h3>Score Distribution</h3>
-              <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-image me-2"></i>Download</button>
             </div>
             <div class="card-body chart-wrapper">
               <div class="y-axis-labels"><span>100%</span><span>50%</span><span>0%</span></div>
@@ -130,7 +128,6 @@
                   <option value="10">Last 10</option>
                   <option value="0">All</option>
                 </select>
-                <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-image me-2"></i>Download</button>
               </div>
             </div>
             <div class="card-body chart-wrapper">
@@ -160,7 +157,6 @@
           <div class="dashboard-card">
             <div class="card-header">
               <h3>Average Performance Trend</h3>
-              <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-image me-2"></i>Download</button>
             </div>
             <div class="card-body chart-wrapper">
               <div class="y-axis-labels"><span>100%</span><span>50%</span><span>0%</span></div>
@@ -189,7 +185,7 @@
           <div class="dashboard-card">
             <div class="card-header">
               <h3>Recent Quiz Attempts</h3>
-              <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-spreadsheet-fill me-2"></i>Download</button>
+              <button class="btn btn-outline-secondary btn-sm" @click="download"><i class="bi bi-file-earmark-spreadsheet-fill me-2"></i>Download</button>
             </div>
             <div class="card-body table-responsive">
               <table class="table table-borderless">
@@ -259,6 +255,16 @@ const performanceBySubjectMap = computed(() => {
     });
     return Object.values(subjectMap).map(sub => ({ ...sub, avgScore: sub.quizzesTaken > 0 ? Math.round(sub.totalPercentage / sub.quizzesTaken) : 0 }));
 });
+
+const download = async () => {
+  try{
+    const response = await apiClient.post('/jobs/export/my-history');
+    alert(`${response.data.message}`)
+  }
+  catch(error){
+    console.log(error)
+  }
+}
 
 const bestSubject = computed(() => {
     if (performanceBySubjectMap.value.length === 0) return 'N/A';

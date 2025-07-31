@@ -6,10 +6,10 @@ from app import db, cache
 from datetime import datetime
 from app.utils.auth import role_required
 from app.utils.validators import validate_string
-
+from app.utils.cache_key import role_based_cache_key
 
 class ChapterResource(Resource):
-    @cache.cached(timeout=3600)
+    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
     @jwt_required()
     def get(self, chapter_id):       
         chapter = Chapter.query.filter_by(id = chapter_id).first()
@@ -67,7 +67,7 @@ class ChapterResource(Resource):
         return {"message": "Chapter deleted successfully"}, 200
 
 class ChapterListResource(Resource):
-    @cache.cached(timeout=3600)
+    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
     @jwt_required()
     def get(self, subject_id):
         

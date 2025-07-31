@@ -16,13 +16,11 @@ export const useQuizStore = defineStore('quizStore', {
     selectQuiz(quiz) {
       this.selectedQuiz = quiz;
       localStorage.setItem('quiz', JSON.stringify(quiz));
-      console.log(this.selectedQuiz);
       return;
     },
 
     deselectQuiz() {
       this.selectedQuiz = null;
-      // console.log(this.selectedQuiz);
       return;
     },
 
@@ -33,7 +31,6 @@ export const useQuizStore = defineStore('quizStore', {
         const data = response.data;
         const message = data.message;
         if(message === "Quiz time ongoing"){
-          console.log([true, data.remaining_time]);
           this.remainingTime = data.remaining_time;
           this.isStarted = true;
           return true
@@ -58,7 +55,6 @@ export const useQuizStore = defineStore('quizStore', {
       try{
         const response = await apiClient.get(`/quiz/${this.selectedQuiz.id}/questions`)
         this.questions = response.data;
-        console.log(this.questions);
       }
       catch{
         this.errorType = "Something went wrong";
@@ -75,7 +71,6 @@ export const useQuizStore = defineStore('quizStore', {
         }
         else{
           await this.getQuestions();
-          console.log(this.questions);
         }
       }
       catch(error){
@@ -109,10 +104,6 @@ export const useQuizStore = defineStore('quizStore', {
       }
       catch(error){
         this.errorType = error.response.message;
-      }
-      finally{
-        console.log(this.quizAnswers);
-        console.log(this.selectedQuiz);
       }
     }
 

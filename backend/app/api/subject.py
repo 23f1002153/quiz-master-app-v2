@@ -5,10 +5,11 @@ from app.models import Subject
 from app import db, cache
 from datetime import datetime
 from app.utils.auth import role_required
+from app.utils.cache_key import role_based_cache_key
 from app.utils.validators import validate_string
 class SubjectResource(Resource):
 
-    @cache.cached(timeout=3600)
+    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
     @jwt_required()
     def get(self, subject_id):
 
@@ -70,7 +71,7 @@ class SubjectResource(Resource):
         return {"message": "Subject deleted successfully"}, 200 
 
 class SubjectListResource(Resource):
-    @cache.cached(timeout=3600)
+    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
     @jwt_required()
     def get(self):
         user = get_jwt()

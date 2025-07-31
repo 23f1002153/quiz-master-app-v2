@@ -62,7 +62,6 @@ const findQuizzes = async () => {
   try{
     const response = await apiClient.get('/user/quizzes');
     completedQuizzes.value = response.data;
-    console.log(response.data)
   }
   catch(error){
     console.log(error);
@@ -74,7 +73,6 @@ const allSubjects = async () => {
   try{
     const response = await apiClient.get('/subjects');
     subjects.value = response.data;
-    // console.log(sub)
   }
   catch(error){
     console.log(error);

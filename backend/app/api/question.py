@@ -7,9 +7,10 @@ from datetime import datetime, date
 from app.utils.auth import role_required
 from app.utils.validators import validate_string, validate_int, validate_date, validate_time
 from app.utils.formatters import format_date, format_time
+from app.utils.cache_key import role_based_cache_key
 
 class QuestionResource(Resource):
-    @cache.cached(timeout=3600)
+    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
     @jwt_required()
     def get(self, question_id):
         question = Question.query.filter_by(id = question_id).first()
@@ -65,7 +66,7 @@ class QuestionResource(Resource):
         return {"message": "Question deleted successfully"}, 200        
 
 class QuestionListResource(Resource):
-    @cache.cached(timeout=3600)
+    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
     @jwt_required()
     def get(self, quiz_id):
         quiz = Quiz.query.filter_by(id = quiz_id).first()

@@ -130,7 +130,6 @@ const submit = async () => {
   await quizStore.submitQuiz(parsedAns);
   localStorage.removeItem('quizAnswers');
   router.push('/quizzeria');
-  // quizStore.deselectQuiz();
 }
 
 const totalSeconds = ref(remainingTime.value * 60);

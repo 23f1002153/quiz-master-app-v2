@@ -53,8 +53,16 @@ const login = async () => {
   try{
     const response = await apiClient.post('/auth/login', data);
     const token = response.data.access_token;
+    const role = response.data.user.role;
+    console.log(role);
     localStorage.setItem('token', token);
-    router.push('/');
+    localStorage.setItem('role', role);
+    if(role === 'admin'){
+      router.push('/admin')
+    }
+    else{
+      router.push('/');
+    }
     alert("Login Successful")
   }
   catch(error){

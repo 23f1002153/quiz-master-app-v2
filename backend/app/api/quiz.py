@@ -7,12 +7,13 @@ from datetime import datetime, date
 from app.utils.auth import role_required
 from app.utils.validators import validate_string, validate_int, validate_date, validate_time
 from app.utils.formatters import format_date, format_time
+from app.utils.cache_key import role_based_cache_key
 
 today = date.today()
 now = datetime.now()
 cur_time = now.time()
 class QuizResource(Resource):
-    @cache.cached(timeout=3600)
+    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
     @jwt_required()
     def get(self, quiz_id):
         quiz = Quiz.query.filter_by(id = quiz_id).first()
@@ -136,7 +137,7 @@ class QuizResource(Resource):
         return {"message": "Quiz deleted successfully"}, 200
 
 class QuizListResource(Resource):
-    @cache.cached(timeout=3600)
+    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
     @jwt_required()
     def get(self, chapter_id):
         chapter = Chapter.query.filter_by(id = chapter_id).first()

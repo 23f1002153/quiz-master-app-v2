@@ -64,12 +64,9 @@ const quizStore = useQuizStore();
 
 const getAns = async () => {
   await quizStore.getAnswers();
-  console.log(quizStore.quizAnswers);
 }
 
 const { quizAnswers } = storeToRefs(quizStore);
-
-
 
 onMounted(() => getAns());
 

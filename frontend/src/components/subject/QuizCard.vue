@@ -80,7 +80,6 @@ const formattedDate = formatDate(props.quiz.date);
 const hasSubmitted = ref(false);
 
 const checkSubmission = async () => {
-  console.log(props.quiz)
   const response = await apiClient.get('/user/attempts');
   const attempts = response.data;
   hasSubmitted.value = attempts.some(attempt => attempt.quiz_id === props.quiz.id);
