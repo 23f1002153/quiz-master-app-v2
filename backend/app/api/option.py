@@ -2,13 +2,14 @@ from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.models import Chapter, Subject, Quiz, Question, Option
-from app import db
+from app import db, cache
 from datetime import datetime, date
 from app.utils.auth import role_required
 from app.utils.validators import validate_string, validate_int, validate_date, validate_time, validate_bool
 from app.utils.formatters import format_date, format_time
 
 class OptionResource(Resource):
+    @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, option_id):
         option = Option.query.filter_by(id = option_id).first()
@@ -46,6 +47,7 @@ class OptionResource(Resource):
                 return {"message": error}, 422
 
         db.session.commit()
+        cache.delete_memoized(OptionResource.get)
 
         return {"message": "Option updated successfully"}, 200
     
@@ -57,10 +59,12 @@ class OptionResource(Resource):
 
         db.session.delete(option)
         db.session.commit()
+        cache.delete_memoized(OptionResource.get)
 
         return {"message": "Option deleted successfully"}, 200
 
 class OptionListResource(Resource):
+    @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, question_id):
         question = db.session.query(Question).filter_by(id = question_id).first()
@@ -100,6 +104,7 @@ class OptionListResource(Resource):
 
         db.session.add(option)
         db.session.commit()
+        cache.delete_memoized(OptionListResource.get)
 
         return {"message": "Option created successfully"}, 201
     

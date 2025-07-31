@@ -2,10 +2,11 @@ from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
 from app.config import Config
-from app.extensions import db, jwt
+from app.extensions import db, jwt, cache
 from app.api import *
 from celery_app import init_celery
 from flask_mail import Mail
+
 
 mail = Mail()
 
@@ -20,6 +21,7 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
     mail.init_app(app)
+    cache.init_app(app)
 
     # Set up the API and register all the routes
     api = Api(app)

@@ -2,18 +2,21 @@ from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.models import Chapter, Subject
-from app import db
+from app import db, cache
 from datetime import datetime
 from app.utils.auth import role_required
 from app.utils.validators import validate_string
 
+
 class ChapterResource(Resource):
+    @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, chapter_id):       
         chapter = Chapter.query.filter_by(id = chapter_id).first()
         if not(chapter):
             return {"message": f"Chapter with id {chapter_id} not found"}, 404
         user = get_jwt()
+        
         if user.get("role") == 'admin':
             return chapter.to_dict(include_internal = True), 200
         else:
@@ -46,6 +49,7 @@ class ChapterResource(Resource):
             chapter.description = description.strip()
 
         db.session.commit()
+        cache.delete_memoized(ChapterResource.get)
 
         return {"message": "Chapter updated successfully"}, 200
     
@@ -58,9 +62,12 @@ class ChapterResource(Resource):
         db.session.delete(chapter)
         db.session.commit()
 
+        cache.delete_memoized(ChapterResource.get)
+
         return {"message": "Chapter deleted successfully"}, 200
 
 class ChapterListResource(Resource):
+    @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, subject_id):
         
@@ -100,6 +107,8 @@ class ChapterListResource(Resource):
 
         db.session.add(chapter)
         db.session.commit()
+
+        cache.delete_memoized(ChapterListResource.get)
 
         return {"message": "Chapter created successfully", "id": chapter.id}, 201
 

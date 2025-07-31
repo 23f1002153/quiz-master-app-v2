@@ -29,3 +29,9 @@ class Config:
     MAIL_USERNAME = 'shrinidhikumar.2003@gmail.com'
     MAIL_PASSWORD = 'wcyy chsm nzym wuxa'  # use App Password, not your main password
     MAIL_DEFAULT_SENDER = 'shrinidhikumar.2003@gmail.com'
+
+    # --- NEW: Caching Configuration ---
+    CACHE_TYPE = 'RedisCache'
+    # Use a different database number (e.g., 1) to keep cache separate from Celery
+    CACHE_REDIS_URL = 'redis://localhost:6379/1' 
+    CACHE_DEFAULT_TIMEOUT = 300 # Default cache expiry in seconds (5 minutes)

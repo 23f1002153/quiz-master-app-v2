@@ -2,13 +2,14 @@ from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import Chapter, Subject, Quiz, Question
-from app import db
+from app import db, cache
 from datetime import datetime, date
 from app.utils.auth import role_required
 from app.utils.validators import validate_string, validate_int, validate_date, validate_time
 from app.utils.formatters import format_date, format_time
 
 class QuestionResource(Resource):
+    @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, question_id):
         question = Question.query.filter_by(id = question_id).first()
@@ -47,6 +48,7 @@ class QuestionResource(Resource):
             question.marks = marks
 
         db.session.commit()
+        cache.delete_memoized(QuestionResource.get)
 
         return {"message": "Question updated successfully"}, 200
 
@@ -58,10 +60,12 @@ class QuestionResource(Resource):
 
         db.session.delete(question)
         db.session.commit()
+        cache.delete_memoized(QuestionResource.get)
 
         return {"message": "Question deleted successfully"}, 200        
 
 class QuestionListResource(Resource):
+    @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, quiz_id):
         quiz = Quiz.query.filter_by(id = quiz_id).first()
@@ -98,6 +102,7 @@ class QuestionListResource(Resource):
 
         db.session.add(question)
         db.session.commit()
+        cache.delete_memoized(QuestionListResource.get)
 
         return {"message": "Question created successfully", "id": question.id}, 201
     

@@ -2,7 +2,7 @@ from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.models import Chapter, Subject, Quiz, User, Attempt
-from app import db
+from app import db, cache
 from datetime import datetime, date
 from app.utils.auth import role_required
 from app.utils.validators import validate_string, validate_int, validate_date, validate_time
@@ -12,6 +12,7 @@ today = date.today()
 now = datetime.now()
 cur_time = now.time()
 class QuizResource(Resource):
+    @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, quiz_id):
         quiz = Quiz.query.filter_by(id = quiz_id).first()
@@ -118,6 +119,7 @@ class QuizResource(Resource):
             quiz.passing = passing  
         
         db.session.commit()
+        cache.delete_memoized(QuizResource.get)
 
         return {"message": "Quiz updated successfully"}, 200
     
@@ -129,10 +131,12 @@ class QuizResource(Resource):
                 
         db.session.delete(quiz)
         db.session.commit()
+        cache.delete_memoized(QuizResource.get)
 
         return {"message": "Quiz deleted successfully"}, 200
 
 class QuizListResource(Resource):
+    @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, chapter_id):
         chapter = Chapter.query.filter_by(id = chapter_id).first()
@@ -201,6 +205,7 @@ class QuizListResource(Resource):
 
         db.session.add(quiz)
         db.session.commit()
+        cache.delete_memoized(QuizListResource.get)
 
         return {"message": "Quiz created successfully", "id": quiz.id}, 201
 

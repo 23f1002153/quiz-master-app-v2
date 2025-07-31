@@ -2,12 +2,13 @@ from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.models import Subject
-from app import db
+from app import db, cache
 from datetime import datetime
 from app.utils.auth import role_required
 from app.utils.validators import validate_string
-
 class SubjectResource(Resource):
+
+    @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, subject_id):
 
@@ -50,6 +51,7 @@ class SubjectResource(Resource):
             subject.description = description.strip()
             
         db.session.commit()
+        cache.delete_memoized(SubjectResource.get)
 
         return {"message": "Subject updated successfully"}, 200
     
@@ -63,9 +65,12 @@ class SubjectResource(Resource):
         db.session.delete(subject)
         db.session.commit()
 
+        cache.delete_memoized(SubjectResource.get)
+
         return {"message": "Subject deleted successfully"}, 200 
 
 class SubjectListResource(Resource):
+    @cache.cached(timeout=3600)
     @jwt_required()
     def get(self):
         user = get_jwt()
@@ -96,19 +101,11 @@ class SubjectListResource(Resource):
         db.session.add(subject)
         db.session.commit()
 
+        cache.delete_memoized(SubjectListResource.get)
+
         return {"message": "Subject created successfully", "id": subject.id}, 201
 
-# class SubjectChapterResource(Resource):
-#     @jwt_required()
-#     def get(self, subject_id):
-#         subject = Subject.query.filter_by(id = subject_id).first()
-#         if not(subject):
-#             return {"message": f"Subject with id {subject_id} not found"}, 404
-        
-#         return [chapter.to_dict() for chapter in subject.chapters], 200
-    
 
 def register_subject_routes(api):
     api.add_resource(SubjectResource, '/api/subject/<int:subject_id>')
     api.add_resource(SubjectListResource, '/api/subjects')
-    # api.add_resource(SubjectChapterResource, '/api/subject/<int:subject_id>/chapters')
