@@ -4,7 +4,6 @@
 from celery_app import celery
 from flask_mail import Message
 from datetime import datetime, timedelta
-# from app import db
 import csv
 import os
 
@@ -35,22 +34,11 @@ def send_daily_reminders():
         two_days_ago = datetime.now() - timedelta(days=2)
         inactive_users = User.query.filter((User.last_login > two_days_ago) & (User.role == 'user')).all()
         
-        # For demonstration, we'll use a dummy list of users.
-        users_to_remind = [
-            {'id': 1, 'username': 'Alex', 'email': '23f1002153@ds.study.iitm.ac.in'},
-            {'id': 2, 'username': 'Ben', 'email': 'noob.snipy007@gmail.com'},
-        ]
         
         # --- 2. Find New Quizzes ---
         # Find quizzes created in the last 24 hours.
         one_day_ago = datetime.now() - timedelta(days=1)
         new_quizzes = Quiz.query.filter(Quiz.created_at > one_day_ago).all()
-        
-        # For demonstration, use a dummy list.
-        # new_quizzes = [
-        #     {'name': 'Advanced Calculus', 'subject': 'Mathematics'},
-        #     {'name': 'The Periodic Table', 'subject': 'Science'},
-        # ]
 
         if not inactive_users and not new_quizzes:
             print("No inactive users or new quizzes. No reminders sent.")
