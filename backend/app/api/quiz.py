@@ -13,17 +13,15 @@ today = date.today()
 now = datetime.now()
 cur_time = now.time()
 class QuizResource(Resource):
-    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
+    # @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, quiz_id):
         quiz = Quiz.query.filter_by(id = quiz_id).first()
         if not(quiz):
             return {"message": f"Quiz with id {quiz_id} not found"}, 404
         user = get_jwt()
-        if user.get("role") == 'admin':
-            return quiz.to_dict(include_internal = True), 200
-        else:
-            return quiz.to_dict(), 200
+        return quiz.to_dict(include_internal = True), 200
+
     
     @role_required('admin')
     def patch(self, quiz_id):
@@ -120,7 +118,7 @@ class QuizResource(Resource):
             quiz.passing = passing  
         
         db.session.commit()
-        cache.delete_memoized(QuizResource.get)
+        # cache.delete_memoized(QuizResource.get)
 
         return {"message": "Quiz updated successfully"}, 200
     
@@ -132,12 +130,12 @@ class QuizResource(Resource):
                 
         db.session.delete(quiz)
         db.session.commit()
-        cache.delete_memoized(QuizResource.get)
+        # cache.delete_memoized(QuizResource.get)
 
         return {"message": "Quiz deleted successfully"}, 200
 
 class QuizListResource(Resource):
-    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
+    # @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, chapter_id):
         chapter = Chapter.query.filter_by(id = chapter_id).first()
@@ -146,10 +144,8 @@ class QuizListResource(Resource):
 
         quizzes = Quiz.query.filter_by(chapter_id = chapter_id).all()
         user = get_jwt()
-        if user.get("role") == 'admin':        
-            return [quiz.to_dict(include_internal = True) for quiz in quizzes], 200
-        else:
-            return [quiz.to_dict() for quiz in quizzes], 200
+        return [quiz.to_dict(include_internal = True) for quiz in quizzes], 200
+
 
     @role_required('admin')
     def post(self, chapter_id):
@@ -206,7 +202,7 @@ class QuizListResource(Resource):
 
         db.session.add(quiz)
         db.session.commit()
-        cache.delete_memoized(QuizListResource.get)
+        # cache.delete_memoized(QuizListResource.get)
 
         return {"message": "Quiz created successfully", "id": quiz.id}, 201
 

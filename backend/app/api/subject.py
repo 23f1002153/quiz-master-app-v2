@@ -9,7 +9,7 @@ from app.utils.cache_key import role_based_cache_key
 from app.utils.validators import validate_string
 class SubjectResource(Resource):
 
-    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
+    # @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, subject_id):
 
@@ -18,10 +18,7 @@ class SubjectResource(Resource):
             return {"message": f"Subject with id {subject_id} not found"}, 404
         
         user = get_jwt()
-        if user.get("role") == 'admin':
-            return subject.to_dict(include_internal = True), 200
-        else:
-            return subject.to_dict(), 200
+        return subject.to_dict(include_internal = True), 200
     
     @role_required('admin')
     def patch(self, subject_id):
@@ -52,7 +49,7 @@ class SubjectResource(Resource):
             subject.description = description.strip()
             
         db.session.commit()
-        cache.delete_memoized(SubjectResource.get)
+        # cache.delete_memoized(SubjectResource.get)
 
         return {"message": "Subject updated successfully"}, 200
     
@@ -66,21 +63,19 @@ class SubjectResource(Resource):
         db.session.delete(subject)
         db.session.commit()
 
-        cache.delete_memoized(SubjectResource.get)
+        # cache.delete_memoized(SubjectResource.get)
 
         return {"message": "Subject deleted successfully"}, 200 
 
 class SubjectListResource(Resource):
-    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
+    # @cache.cached(timeout=3600)
     @jwt_required()
     def get(self):
         user = get_jwt()
         subjects = Subject.query.all()
 
-        if user.get("role") == 'admin':
-            return [subject.to_dict(include_internal = True) for subject in subjects], 200
-        else:
-            return [subject.to_dict() for subject in subjects], 200
+        return [subject.to_dict(include_internal = True) for subject in subjects], 200
+
     
     @role_required('admin')
     def post(self):
@@ -102,7 +97,7 @@ class SubjectListResource(Resource):
         db.session.add(subject)
         db.session.commit()
 
-        cache.delete_memoized(SubjectListResource.get)
+        # cache.delete_memoized(SubjectListResource.get)
 
         return {"message": "Subject created successfully", "id": subject.id}, 201
 

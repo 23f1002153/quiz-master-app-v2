@@ -9,7 +9,7 @@ from app.utils.validators import validate_string
 from app.utils.cache_key import role_based_cache_key
 
 class ChapterResource(Resource):
-    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
+    # @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, chapter_id):       
         chapter = Chapter.query.filter_by(id = chapter_id).first()
@@ -17,11 +17,8 @@ class ChapterResource(Resource):
             return {"message": f"Chapter with id {chapter_id} not found"}, 404
         user = get_jwt()
         
-        if user.get("role") == 'admin':
-            return chapter.to_dict(include_internal = True), 200
-        else:
-            return chapter.to_dict(), 200
-    
+        return chapter.to_dict(include_internal = True), 200
+  
     @role_required('admin')
     def patch(self, chapter_id):
         chapter = Chapter.query.filter_by(id = chapter_id).first()
@@ -49,7 +46,7 @@ class ChapterResource(Resource):
             chapter.description = description.strip()
 
         db.session.commit()
-        cache.delete_memoized(ChapterResource.get)
+        # cache.delete_memoized(ChapterResource.get)
 
         return {"message": "Chapter updated successfully"}, 200
     
@@ -67,7 +64,7 @@ class ChapterResource(Resource):
         return {"message": "Chapter deleted successfully"}, 200
 
 class ChapterListResource(Resource):
-    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
+    # @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, subject_id):
         
@@ -77,11 +74,9 @@ class ChapterListResource(Resource):
          
         chapters = Chapter.query.filter_by(subject_id = subject_id).all()
 
-        user = get_jwt() 
-        if user.get("role") == 'admin':        
-            return [chapter.to_dict(include_internal = True) for chapter in chapters], 200
-        else:
-            return [chapter.to_dict() for chapter in chapters], 200
+        user = get_jwt()
+        return [chapter.to_dict(include_internal = True) for chapter in chapters], 200
+
 
     @role_required('admin')
     def post(self, subject_id):
@@ -108,7 +103,7 @@ class ChapterListResource(Resource):
         db.session.add(chapter)
         db.session.commit()
 
-        cache.delete_memoized(ChapterListResource.get)
+        # cache.delete_memoized(ChapterListResource.get)
 
         return {"message": "Chapter created successfully", "id": chapter.id}, 201
 

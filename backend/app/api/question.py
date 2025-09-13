@@ -10,7 +10,7 @@ from app.utils.formatters import format_date, format_time
 from app.utils.cache_key import role_based_cache_key
 
 class QuestionResource(Resource):
-    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
+    # @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, question_id):
         question = Question.query.filter_by(id = question_id).first()
@@ -49,7 +49,7 @@ class QuestionResource(Resource):
             question.marks = marks
 
         db.session.commit()
-        cache.delete_memoized(QuestionResource.get)
+        # cache.delete_memoized(QuestionResource.get)
 
         return {"message": "Question updated successfully"}, 200
 
@@ -61,12 +61,12 @@ class QuestionResource(Resource):
 
         db.session.delete(question)
         db.session.commit()
-        cache.delete_memoized(QuestionResource.get)
+        # cache.delete_memoized(QuestionResource.get)
 
         return {"message": "Question deleted successfully"}, 200        
 
 class QuestionListResource(Resource):
-    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
+    # @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, quiz_id):
         quiz = Quiz.query.filter_by(id = quiz_id).first()
@@ -103,7 +103,7 @@ class QuestionListResource(Resource):
 
         db.session.add(question)
         db.session.commit()
-        cache.delete_memoized(QuestionListResource.get)
+        # cache.delete_memoized(QuestionListResource.get)
 
         return {"message": "Question created successfully", "id": question.id}, 201
     

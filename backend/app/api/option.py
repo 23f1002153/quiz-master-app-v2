@@ -10,17 +10,14 @@ from app.utils.formatters import format_date, format_time
 from app.utils.cache_key import role_based_cache_key
 
 class OptionResource(Resource):
-    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
+    # @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, option_id):
         option = Option.query.filter_by(id = option_id).first()
         if not(option):
             return {"message": f"Option with id {option_id} not found"}, 404
         user = get_jwt()
-        if user.get("role") == 'admin' or (option.question.quiz.is_ended):        
-            return option.to_dict(include_internal = True), 200
-        else:
-            return option.to_dict(), 200
+        return option.to_dict(include_internal = True), 200
         
     @role_required('admin')
     def patch(self, option_id):
@@ -48,7 +45,7 @@ class OptionResource(Resource):
                 return {"message": error}, 422
 
         db.session.commit()
-        cache.delete_memoized(OptionResource.get)
+        # cache.delete_memoized(OptionResource.get)
 
         return {"message": "Option updated successfully"}, 200
     
@@ -60,12 +57,12 @@ class OptionResource(Resource):
 
         db.session.delete(option)
         db.session.commit()
-        cache.delete_memoized(OptionResource.get)
+        # cache.delete_memoized(OptionResource.get)
 
         return {"message": "Option deleted successfully"}, 200
 
 class OptionListResource(Resource):
-    @cache.cached(timeout=3600, key_prefix=role_based_cache_key)
+    # @cache.cached(timeout=3600)
     @jwt_required()
     def get(self, question_id):
         question = db.session.query(Question).filter_by(id = question_id).first()
@@ -74,10 +71,8 @@ class OptionListResource(Resource):
 
         options = db.session.query(Option).filter_by(question_id = question_id).all()
         user = get_jwt()
-        if user.get("role") == 'admin' or question.quiz.is_ended:
-            return [option.to_dict(include_internal=True) for option in options]
-        else:
-            return [option.to_dict() for option in options]
+        return [option.to_dict(include_internal=True) for option in options]
+
 
     @role_required('admin')
     def post(self, question_id):
@@ -105,7 +100,7 @@ class OptionListResource(Resource):
 
         db.session.add(option)
         db.session.commit()
-        cache.delete_memoized(OptionListResource.get)
+        # cache.delete_memoized(OptionListResource.get)
 
         return {"message": "Option created successfully"}, 201
     

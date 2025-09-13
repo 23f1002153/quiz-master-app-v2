@@ -1,5 +1,9 @@
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
+MAIL_USERNAME = os.getenv('MAIL_USERNAME')  # Your email address
+MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')  # Your email password or app password
 class Config:
     # Base directory for database file
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -14,14 +18,6 @@ class Config:
     # Celery
     celery_broker_url = 'redis://localhost:6379/0'
     celery_result_backend = 'redis://localhost:6379/0'
-
-    # Gmail SMTP
-    # MAIL_SERVER = 'smtp-relay.brevo.com'
-    # MAIL_PORT = 587
-    # MAIL_USE_TLS = True
-    # MAIL_USERNAME = '93917b001@smtp-brevo.com'
-    # MAIL_PASSWORD = 'nLxbRCv2w4X0BHp6'  # use App Password, not your main password
-    # MAIL_DEFAULT_SENDER = 'noob.snipy007@gmail.com'
 
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587

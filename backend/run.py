@@ -1,7 +1,8 @@
 from app import create_app
-
+from app import cache
 # This is where the Flask app object is actually created.
 app = create_app()
+# cache.clear()
 
 # This block allows you to run the Flask development server
 # by executing "python run.py" in your terminal.
