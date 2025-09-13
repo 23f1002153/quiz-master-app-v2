@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 MAIL_USERNAME = os.getenv('MAIL_USERNAME')  # Your email address
 MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')  # Your email password or app password
+
 class Config:
     # Base directory for database file
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -22,9 +23,9 @@ class Config:
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
-    MAIL_USERNAME = 'shrinidhikumar.2003@gmail.com'
-    MAIL_PASSWORD = 'wcyy chsm nzym wuxa'  # use App Password, not your main password
-    MAIL_DEFAULT_SENDER = 'shrinidhikumar.2003@gmail.com'
+    MAIL_USERNAME = MAIL_USERNAME
+    MAIL_PASSWORD = MAIL_PASSWORD  # use App Password, not your main password
+    MAIL_DEFAULT_SENDER = MAIL_USERNAME
 
     # --- NEW: Caching Configuration ---
     CACHE_TYPE = 'RedisCache'
